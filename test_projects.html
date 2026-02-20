@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test GitHub Projects</title>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f8fafc;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+        h1 {
+            color: #1e293b;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+        .projects-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+        }
+        .project-card {
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            transition: transform 0.3s ease;
+        }
+        .project-card:hover {
+            transform: translateY(-5px);
+        }
+        .project-image {
+            height: 200px;
+            background: #e2e8f0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #64748b;
+            font-size: 14px;
+        }
+        .project-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        .project-content {
+            padding: 20px;
+        }
+        .project-title {
+            margin: 0 0 10px 0;
+            color: #1e293b;
+            font-size: 18px;
+        }
+        .project-description {
+            color: #64748b;
+            margin-bottom: 15px;
+            line-height: 1.5;
+        }
+        .project-tech {
+            margin-bottom: 15px;
+        }
+        .tech-tag {
+            display: inline-block;
+            background: #f1f5f9;
+            color: #334155;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            margin-right: 5px;
+            margin-bottom: 5px;
+        }
+        .project-links {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        .project-link {
+            text-decoration: none;
+            color: #3b82f6;
+            font-size: 14px;
+            padding: 8px 12px;
+            border: 1px solid #3b82f6;
+            border-radius: 6px;
+            transition: all 0.2s ease;
+        }
+        .project-link:hover {
+            background: #3b82f6;
+            color: white;
+        }
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #64748b;
+        }
+        .error {
+            color: #ef4444;
+            text-align: center;
+            padding: 20px;
+            background: #fef2f2;
+            border: 1px solid #fecaca;
+            border-radius: 6px;
+            margin: 20px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>GitHub Projects Test</h1>
+        <div id="projects-container" class="projects-grid">
+            <div class="loading">Loading projects from GitHub...</div>
+        </div>
+    </div>
+
+    <script>
+        // Test the GitHub API integration
+        const GITHUB_USERNAME = 'popen006';
+        const GITHUB_API_URL = `https://api.github.com/users/${GITHUB_USERNAME}/repos`;
+
+        async function fetchGithubProjects() {
+            try {
+                const response = await fetch(GITHUB_API_URL);
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                const repos = await response.json();
+                
+                // Filter out forks and private repos
+                const projects = repos.filter(repo => !repo.fork && !repo.private);
+                
+                return projects.sort((a, b) => b.stargazers_count - a.stargazers_count);
+            } catch (error) {
+                console.error('Failed to fetch GitHub projects:', error);
+                return null;
+            }
+        }
+
+        function getProjectImage(repoName, description) {
+            // Try to get GitHub Open Graph image
+            return `https://opengraph.githubassets.com/1/popen006/${repoName}`;
+        }
+
+        function categorizeProjectFromRepo(repo) {
+            const name = repo.name.toLowerCase();
+            const description = (repo.description || '').toLowerCase();
+            const language = (repo.language || '').toLowerCase();
+            
+            if (name.includes('web') || name.includes('site') || name.includes('app') || 
+                description.includes('web') || description.includes('website') ||
+                language === 'javascript' || language === 'html' || language === 'css' ||
+                language === 'react' || language === 'vue' || language === 'angular') {
+                return 'web';
+            }
+            
+            if (name.includes('mobile') || name.includes('app') || 
+                description.includes('mobile') || description.includes('android') || description.includes('ios') ||
+                language === 'java' || language === 'kotlin' || language === 'swift') {
+                return 'mobile';
+            }
+            
+            if (name.includes('desktop') || name.includes('windows') || name.includes('java') ||
+                description.includes('desktop') || description.includes('windows') ||
+                language === 'java' || language === 'c#' || language === 'python' || language === 'c++') {
+                return 'desktop';
+            }
+            
+            return 'other';
+        }
+
+        function displayProjects(projects) {
+            const container = document.getElementById('projects-container');
+            container.innerHTML = '';
+            
+            if (!projects || projects.length === 0) {
+                container.innerHTML = `
+                    <div class="error">
+                        No public repositories found or failed to fetch projects.
+                    </div>
+                `;
+                return;
+            }
+
+            projects.forEach(project => {
+                const projectImage = getProjectImage(project.name, project.description);
+                const category = categorizeProjectFromRepo(project);
+                
+                const projectCard = document.createElement('div');
+                projectCard.className = `project-card category-${category}`;
+                projectCard.innerHTML = `
+                    <div class="project-image">
+                        <img src="${projectImage}" alt="${project.name}" onerror="this.parentElement.style.background='#e2e8f0'; this.parentElement.innerHTML='<i class=\'fas fa-code\'></i> Image not available';">
+                    </div>
+                    <div class="project-content">
+                        <h3 class="project-title">${project.name}</h3>
+                        <p class="project-description">${project.description || 'No description available'}</p>
+                        <div class="project-tech">
+                            <span class="tech-tag">${project.language || 'Unknown'}</span>
+                            <span class="tech-tag">Stars: ${project.stargazers_count}</span>
+                            <span class="tech-tag">Category: ${category}</span>
+                        </div>
+                        <div class="project-links">
+                            <a href="${project.html_url}" class="project-link" target="_blank">
+                                <i class="fab fa-github"></i> GitHub
+                            </a>
+                            ${project.homepage ? `<a href="${project.homepage}" class="project-link" target="_blank">
+                                <i class="fas fa-external-link-alt"></i> Live Demo
+                            </a>` : ''}
+                        </div>
+                    </div>
+                `;
+                container.appendChild(projectCard);
+            });
+        }
+
+        // Load projects
+        fetchGithubProjects().then(projects => {
+            displayProjects(projects);
+        }).catch(error => {
+            document.getElementById('projects-container').innerHTML = `
+                <div class="error">
+                    Error loading projects: ${error.message}
+                </div>
+            `;
+        });
+    </script>
+</body>
+</html>

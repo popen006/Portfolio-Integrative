@@ -1,0 +1,36 @@
+{
+  "name": "portfolio-website",
+  "version": "1.0.0",
+  "description": "Carl's Portfolio Website with MySQL Backend",
+  "main": "index.js",
+  "scripts": {
+    "start": "node server/server.js",
+    "dev": "cd server && npm start",
+    "test": "node test_database.js",
+    "install:server": "cd server && npm install"
+  },
+  "keywords": [
+    "portfolio",
+    "website",
+    "mysql",
+    "express",
+    "nodejs"
+  ],
+  "author": "Carl",
+  "license": "MIT",
+  "dependencies": {
+    "mysql2": "^3.6.5",
+    "express": "^4.18.2",
+    "cors": "^2.8.5",
+    "dotenv": "^16.3.1",
+    "helmet": "^7.1.0",
+    "express-rate-limit": "^7.1.5",
+    "express-validator": "^7.0.1",
+    "bcryptjs": "^2.4.3",
+    "jsonwebtoken": "^9.0.2",
+    "nodemailer": "^6.9.7"
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  }
+}
