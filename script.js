@@ -256,7 +256,10 @@ function getLocalProjectImage(repoName) {
         'soulmate-website': 'assets/images/projects/soulmate.jpg',
         'soulmate-backup': 'assets/images/projects/soulmate-backup-preview.jpg',
         'console-based-grading-system': 'assets/images/projects/console-based-grading-system.jpg',
-        'tiffany-s-cake-and-pastries': 'assets/images/projects/tiffany.jpg'
+        'tiffany-s-cake-and-pastries': 'assets/images/projects/tiffany.jpg',
+        'portfolio': 'assets/images/projects/portfolio-preview.jpg',
+        'portfolio-website': 'assets/images/projects/portfolio-preview.jpg',
+        'it-portfolio': 'assets/images/projects/portfolio-preview.jpg'
     };
     
     return imageMap[repoLower] || null;
